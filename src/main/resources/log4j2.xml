@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+<!--        <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %logger{36} - %msg%n" />-->
+			<PatternLayout pattern="%msg%n" />
+        </Console>
+        <RollingFile name="InfoFileAppender" fileName="logs/info.log" filePattern="logs/info-%d{yyyy-MM-dd}.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+        <RollingFile name="DebugFileAppender" fileName="logs/debug.log" filePattern="logs/debug-%d{yyyy-MM-dd}.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+        <RollingFile name="TraceFileAppender" fileName="logs/trace.log" filePattern="logs/trace-%d{yyyy-MM-dd}.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="ConsoleAppender" level="trace" />
+            <AppenderRef ref="InfoFileAppender" level="info" />
+            <AppenderRef ref="DebugFileAppender" level="debug" />
+            <AppenderRef ref="TraceFileAppender" level="trace" />
+        </Root>
+    </Loggers>
+</Configuration>
