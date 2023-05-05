@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,12 +56,16 @@ public final class Hotel {
 	public String getHotelName() {
 		return hotelName;
 	}
+	
+	public static HashSet<String> getLocations() {
+		return Utils.createHashSetFromFileContents("./src/main/resources/laba/travelagency/testdata/locations.csv");
+	}
 
 	public static List<Hotel> search(String location, String dateOfStay) {
 		
 		List<Hotel> matchingHotels = new ArrayList<>();
 		
-		for(Hotel hotel: readHotelsFromCsv(new File("./src/test/resources/com/mytravelagency/testdata/hotelsData.csv")))
+		for(Hotel hotel: readHotelsFromCsv(new File("./src/main/resources/laba/travelagency/testdata/hotelsData.csv")))
 		{
 			if(hotel.getLocation().equalsIgnoreCase(location) && hotel.getAvailableDate().equals(dateOfStay))
 			{

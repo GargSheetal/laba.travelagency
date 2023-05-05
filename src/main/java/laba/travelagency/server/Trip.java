@@ -10,6 +10,7 @@ public class Trip implements ITrip {
 	private ReservationList<ICarReservation> carReservations = new ReservationList<ICarReservation>();
 	
 	private static double ONLINE_BOOKING_FEE;
+	
 	static {
 		ONLINE_BOOKING_FEE = 0.55;
 	}

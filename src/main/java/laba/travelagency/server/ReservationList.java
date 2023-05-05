@@ -17,6 +17,13 @@ public class ReservationList<T> {
 			this.setTotalAmount(this.totalAmount + amount);
 		}
 	}
+	
+	public void removeReservation(T reservation) {
+		if(reservationList.contains(reservation))
+		{
+			reservationList.remove(reservation);
+		}
+	}
 
 	public List<T> getReservationList() {
 		return reservationList;

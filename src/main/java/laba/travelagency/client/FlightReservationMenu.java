@@ -1,22 +1,20 @@
-package laba.travelagency.server;
+package laba.travelagency.client;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import laba.travelagency.exceptions.InputDoesNotMatchException;
 import laba.travelagency.exceptions.InvalidInputException;
 import laba.travelagency.exceptions.InvalidStateException;
+import laba.travelagency.server.Flight;
+import laba.travelagency.server.Seat;
 
 public class FlightReservationMenu {
 	
 	private static Scanner scanner = new Scanner(System.in);
-	private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-	private static final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
 	private static final Logger logger = LogManager.getLogger(FlightReservationMenu.class);
 	
 	public static String readOriginAirports() {
@@ -34,7 +32,7 @@ public class FlightReservationMenu {
 			logger.info("InvalidInputException : " + e.getMessage());
 			selectedOriginAirport = readOriginAirports();
 		}
-		
+		logger.debug("originAirport: {}", selectedOriginAirport);
 		return selectedOriginAirport;
 	}
 	
@@ -53,49 +51,53 @@ public class FlightReservationMenu {
 			logger.info("InvalidInputException : " + e.getMessage());
 			selectedDestinationAirport = readDestinationAirports();
 		}
-		
+		logger.debug("destinationAirport: {}", selectedDestinationAirport);
 		return selectedDestinationAirport;
 	}
 	
-	public static String readEmailInput(String prompt) {
-		
-		logger.info(prompt);
-		String email = scanner.nextLine();
-		
-		try {
-			if(!(pattern.matcher(email).matches()))
-				throw new InvalidInputException("Invalid Email. Please provide correct email !!");
-		}
-		catch(InvalidInputException e) 
+	public static List<Flight> getSearchFlightResults(String originAirport, String destinationAirport, String departureDate) {
+		List<Flight> searchFlightResults = Flight.search(originAirport, destinationAirport, departureDate);
+		logger.info("\nSearch Results -----");
+		for(Flight flight: searchFlightResults)
 		{
-			logger.info("\nInvalidInputException : " + e.getMessage());
-			logger.info("Enter Input again...");
-			email = readEmailInput(prompt);
+			logger.info(
+					(searchFlightResults.indexOf(flight) + 1) + " | " +
+					flight.toString()
+					);
 		}
-		
-		return email;
+		logger.trace("Flight search results fetched");
+		return searchFlightResults;
 	}
 	
+	public static int requestMaxNoOfStops() {
+		logger.info("Enter max number of stops : ");
+		int maxNoOfStops = scanner.nextInt();scanner.nextLine();
+		logger.debug("maxNoOfStops: {}", maxNoOfStops);
+		return maxNoOfStops;
+	}
 	
-	public static String requestCustomerEmail() {
-		
-		String customerEmail = readEmailInput("Customer Email : ");
-		String confirmEmail = readEmailInput("Confirm Email : ");
-		
-		try {
-			if(!(customerEmail.equals(confirmEmail)))
-			{
-				throw new InputDoesNotMatchException("Email Inputs do not match !!");
-			}
-		}
-		catch(InputDoesNotMatchException e)
+	public static List<Flight> getFilteredFlightResults(List<Flight> searchFlightResults, double maxPrice, int maxNoOfStops) {
+		List<Flight> filterFlightResults = Flight.filter(searchFlightResults, maxPrice, maxNoOfStops);
+		logger.info("\nFiltered Results -----");
+		for(Flight flight: filterFlightResults)
 		{
-			logger.info("\nInputDoesNotMatchException : " + e.getMessage());
-			logger.info("Enter Inputs again");
-			customerEmail = requestCustomerEmail();
+			logger.info(
+					(filterFlightResults.indexOf(flight) + 1) + " | " +
+					flight.toString()
+					);
 		}
-		return customerEmail;
+		logger.trace("Flight search results filtered");
+		return filterFlightResults;
+	}
+	
+	public static Flight requestSelectFlight(List<Flight> filterFlightResults) {
+		logger.info("Select your flight : ");
+		int selectedFlightIdx = scanner.nextInt();scanner.nextLine();
 		
+		Flight selectedFlight = filterFlightResults.get(selectedFlightIdx - 1);
+		logger.info("\nFlight Selected -----");
+		logger.info(selectedFlight.toString());
+		return selectedFlight;
 	}
 	
 	public static Seat requestSeatNumber(Flight flight, String email) {
@@ -113,6 +115,7 @@ public class FlightReservationMenu {
 			logger.info("Enter input again....");
 			seat = requestSeatNumber(flight, email);
 		}
+		logger.debug("Seat Selected: {}", seat.toString());
 		return seat;
 	}
 	
@@ -142,5 +145,19 @@ public class FlightReservationMenu {
 		logger.info("   | Queue for upgrade to Business Class : " + 
 				flight.queueForUpgradeToBusinessClass.toString());
 		
+	}
+	
+	public static boolean requestNeedSpecialAssistance() {
+		logger.info("\nneedSpecialAssistance : ");
+		Boolean needSpecialAssistance = scanner.nextBoolean();scanner.nextLine();
+		logger.debug("needSpecialAssistance: {}", needSpecialAssistance);
+		return needSpecialAssistance;
+	}
+	
+	public static boolean requestNeedMealService() {
+		logger.info("needMealService : ");
+		boolean needMealService = scanner.nextBoolean();scanner.nextLine();
+		logger.debug("needMealService: {}", needMealService);
+		return needMealService;
 	}
 }

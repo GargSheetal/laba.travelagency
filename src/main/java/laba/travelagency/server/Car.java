@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -74,12 +75,15 @@ public final class Car {
 		this.carType = carType;
 	}
 	
+	public static HashSet<String> getLocations() {
+		return Utils.createHashSetFromFileContents("./src/main/resources/laba/travelagency/testdata/locations.csv");
+	}
 	
 	public static List<Car> search(String location, String pickupDate, String dropOffDate) {
 		
 		List<Car> matchingCars = new ArrayList<>();
 		
-		for(Car car: readCarsFromCsv(new File("./src/test/resources/com/mytravelagency/testdata/carsData.csv")))
+		for(Car car: readCarsFromCsv(new File("./src/main/resources/laba/travelagency/testdata/carsData.csv")))
 		{
 			if(
 					car.getLocation().equalsIgnoreCase(location) 

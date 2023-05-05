@@ -79,14 +79,14 @@ public final class Flight {
 	}
 	
 	public static HashSet<String> getAirportCodes() {
-		return Utils.createHashSetFromFileContents("./src/test/resources/com/mytravelagency/testdata/airportCodes.txt");
+		return Utils.createHashSetFromFileContents("./src/main/resources/laba/travelagency/testdata/airportCodes.txt");
 	}
 
 	public static List<Flight> search(String originAirport, String destinationAirport, String departureDate) {
 		
 		List<Flight> matchingFlights = new ArrayList<>();
 		
-		for(Flight flight: readFlightsFromCsv(new File("./src/test/resources/com/mytravelagency/testdata/flightsData.csv")))
+		for(Flight flight: readFlightsFromCsv(new File("./src/main/resources/laba/travelagency/testdata/flightsData.csv")))
 		{
 			if(
 					flight.getOriginAirport().equalsIgnoreCase(originAirport) 

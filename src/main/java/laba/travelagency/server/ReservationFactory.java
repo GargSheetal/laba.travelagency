@@ -3,7 +3,6 @@
  */
 package laba.travelagency.server;
 
-
 /**
  * @author sheetal
  *
