@@ -2,9 +2,14 @@ package laba.travelagency.client;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Stream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import laba.travelagency.enums.CarType;
+import laba.travelagency.enums.ReservationType;
+import laba.travelagency.enums.RoomType;
 import laba.travelagency.exceptions.InvalidStateException;
 import laba.travelagency.exceptions.MissingInputException;
 import laba.travelagency.server.Car;
@@ -32,12 +37,14 @@ public class Main {
 		
 		String originAirport = FlightReservationMenu.readOriginAirports();
 	
-		String destinationAirport = FlightReservationMenu.readDestinationAirports();
+		String destinationAirport = FlightReservationMenu.readDestinationAirports(originAirport);
 		
 		String departureDate = MenuHelper.requestDate("Enter departure date (yyyy-MM-dd) : ");
 		logger.debug("departureDate: {}", departureDate);
 		
 		List<Flight> searchFlightResults = FlightReservationMenu.getSearchFlightResults(originAirport, destinationAirport, departureDate);
+		logger.info("\nSearch Results -----");
+		MenuHelper.printList(searchFlightResults, flight -> System.out.println((searchFlightResults.indexOf(flight) + 1) + " | " + flight.toString()));
 		
 		logger.info("\nSet Filters : ");
 		double maxPrice = MenuHelper.requestMaxPrice();
@@ -45,6 +52,8 @@ public class Main {
 		int maxNoOfStops = FlightReservationMenu.requestMaxNoOfStops();
 
 		List<Flight> filterFlightResults = FlightReservationMenu.getFilteredFlightResults(searchFlightResults, maxPrice, maxNoOfStops);
+		logger.info("\nFiltered Results -----");
+		MenuHelper.printList(filterFlightResults, flight -> System.out.println((filterFlightResults.indexOf(flight) + 1) + " | " + flight.toString()));
 		
 		Flight selectedFlight = FlightReservationMenu.requestSelectFlight(filterFlightResults);
 		
@@ -96,13 +105,17 @@ public class Main {
 		logger.debug("dateOfStay: {}", dateOfStay);
 		
 		List<Hotel> searchHotelResults = HotelReservationMenu.getHotelSearchResults(location, dateOfStay);
+		logger.info("\nSearch Results -----");
+		MenuHelper.printList(searchHotelResults, hotel -> System.out.println((searchHotelResults.indexOf(hotel) + 1) + " | " + hotel.toString()));
 		
 		logger.info("\nSet Filters : ");
 		double maxPrice = MenuHelper.requestMaxPrice();
 		
-		String roomType = HotelReservationMenu.requestRoomType();
+		RoomType roomType = HotelReservationMenu.requestRoomType();
 		
 		List<Hotel> filteredHotelResults = HotelReservationMenu.getFilteredHotelResults(searchHotelResults, maxPrice, roomType);
+		logger.info("\nFiltered results -----");
+		MenuHelper.printList(filteredHotelResults, hotel -> System.out.println((filteredHotelResults.indexOf(hotel) + 1) + " | " + hotel.toString()));
 		
 		Hotel selectedHotel = HotelReservationMenu.requestSelectHotel(filteredHotelResults);
 		
@@ -145,14 +158,18 @@ public class Main {
 		logger.debug("dropOffDate: {}", dropOffDate);
 		
 		List<Car> searchCarResults = CarReservationMenu.getCarSearchResults(location, pickupDate, dropOffDate);
+		logger.info("\nSearch Results -----");
+		MenuHelper.printList(searchCarResults, car -> System.out.println((searchCarResults.indexOf(car) + 1) + " | " + car.toString()));
 		
 		logger.info("\nSet Filters : ");
 		double maxPrice = MenuHelper.requestMaxPrice();
 		
-		String carType = CarReservationMenu.requestCarType();
+		CarType carType = CarReservationMenu.requestCarType();
 		
 		List<Car> filteredCarResults = CarReservationMenu.getFilteredCarResults(searchCarResults, maxPrice, carType);
-			
+		logger.info("\nFiltered results -----");
+		MenuHelper.printList(filteredCarResults, car -> System.out.println((filteredCarResults.indexOf(car) + 1) + " | " + car.toString()));
+		
 		Car selectedCar = CarReservationMenu.requestSelectCar(filteredCarResults);
 		
 		ICarReservation carReservation = ReservationFactory.createCarReservation(selectedCar);
@@ -190,29 +207,37 @@ public class Main {
 	
 	private static void mainMenu() throws MissingInputException {
 		
+//		logger.info(
+//			"\n Main Menu -----" + 
+//			"\n 1. Flight Reservation" + 
+//			"\n 2. Hotel Reservation" +
+//			"\n 3. Car Reservation" + 
+//			"\n 4. Exit" + 
+//			"\n Enter your response : "
+//		);
+//
+//		ReservationType[] reservationTypes = ReservationType.values();
+//		String reservationTypeList = "";
+//	    for (ReservationType reservationType : reservationTypes) {
+//	    	reservationTypeList = reservationTypeList + reservationType.getDisplayName() + " ";
+//	    }
+//		
+//		logger.info("\nEnter Reservation Type - " + reservationTypeList + " : ");		
+//		String reservationTypeInput = scanner.nextLine();
 		logger.info("\nPresenting Main Menu");
-		logger.info(
-			"\n Main Menu -----" + 
-			"\n 1. Flight Reservation" + 
-			"\n 2. Hotel Reservation" +
-			"\n 3. Car Reservation" + 
-			"\n 4. Exit" + 
-			"\n Enter your response : "
-		);
-		int mainMenuResponse = scanner.nextInt(); scanner.nextLine();
 		
-		switch(mainMenuResponse) {
-			case 1:
+		switch(MenuHelper.requestReservationType()) {
+			case FLIGHT:
 				IFlightReservation flightReservation = flightReservationMenuItem();
-				trip.getFlightReservations().addReservation(flightReservation, flightReservation.getFlight().getPrice()); 
+				trip.getFlightReservations().addReservation(flightReservation, flightReservation.getFlight().getPrice() + ReservationType.FLIGHT.getBookingFee()); 
 				addMoreTripReservations(); break;
-			case 2: 
+			case HOTEL: 
 				IHotelReservation hotelReservation = hotelReservationMenuItem();
-				trip.getHotelReservations().addReservation(hotelReservation, hotelReservation.getHotel().getPrice()); 
+				trip.getHotelReservations().addReservation(hotelReservation, hotelReservation.getHotel().getPrice() + ReservationType.HOTEL.getBookingFee()); 
 				addMoreTripReservations(); break;
-			case 3: 
+			case CAR: 
 				ICarReservation carReservation = carReservationMenuItem();
-				trip.getCarReservations().addReservation(carReservation, carReservation.getCar().getPrice()); 
+				trip.getCarReservations().addReservation(carReservation, carReservation.getCar().getPrice() + ReservationType.CAR.getBookingFee()); 
 				addMoreTripReservations(); break;
 			default: break;
 		}

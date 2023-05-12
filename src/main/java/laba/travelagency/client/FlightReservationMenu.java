@@ -1,8 +1,9 @@
 package laba.travelagency.client;
 
-import java.util.HashSet;
+import java.io.File;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +12,7 @@ import laba.travelagency.exceptions.InvalidInputException;
 import laba.travelagency.exceptions.InvalidStateException;
 import laba.travelagency.server.Flight;
 import laba.travelagency.server.Seat;
+import laba.travelagency.server.Utils;
 
 public class FlightReservationMenu {
 	
@@ -18,11 +20,11 @@ public class FlightReservationMenu {
 	private static final Logger logger = LogManager.getLogger(FlightReservationMenu.class);
 	
 	public static String readOriginAirports() {
-		HashSet<String> originAirports = Flight.getAirportCodes();
+		Set<String> originAirports = Flight.getAirportCodes();
 		logger.info("\nEnter Origin Airport " + originAirports.toString() + " :");
 		String selectedOriginAirport = scanner.nextLine();
 		try {
-			if(!(originAirports.contains(selectedOriginAirport)))
+			if(!(originAirports.contains(selectedOriginAirport.toUpperCase())))
 			{
 				throw new InvalidInputException("Unknown Airport Code !");
 			}
@@ -36,37 +38,42 @@ public class FlightReservationMenu {
 		return selectedOriginAirport;
 	}
 	
-	public static String readDestinationAirports() {
-		HashSet<String> destinationAirports = Flight.getAirportCodes();
+	public static String readDestinationAirports(String originAirport) {
+		Set<String> destinationAirports = Flight.getAirportCodes();
 		logger.info("Enter Destination Airport " + destinationAirports.toString() + " :");
 		String selectedDestinationAirport = scanner.nextLine();
 		try {
-			if(!(destinationAirports.contains(selectedDestinationAirport)))
+			if(!(destinationAirports.contains(selectedDestinationAirport.toUpperCase())))
 			{
 				throw new InvalidInputException("Unknown Airport Code !");
+			}
+			if(selectedDestinationAirport.equalsIgnoreCase(originAirport))
+			{
+				throw new InvalidInputException("Invalid Input! Destination Airport cannot be same as Origin Airport");
 			}
 		}
 		catch(InvalidInputException e)
 		{
 			logger.info("InvalidInputException : " + e.getMessage());
-			selectedDestinationAirport = readDestinationAirports();
+			selectedDestinationAirport = readDestinationAirports(originAirport);
 		}
 		logger.debug("destinationAirport: {}", selectedDestinationAirport);
 		return selectedDestinationAirport;
 	}
 	
 	public static List<Flight> getSearchFlightResults(String originAirport, String destinationAirport, String departureDate) {
-		List<Flight> searchFlightResults = Flight.search(originAirport, destinationAirport, departureDate);
-		logger.info("\nSearch Results -----");
-		for(Flight flight: searchFlightResults)
-		{
-			logger.info(
-					(searchFlightResults.indexOf(flight) + 1) + " | " +
-					flight.toString()
-					);
-		}
-		logger.trace("Flight search results fetched");
-		return searchFlightResults;
+		
+		return Utils.search(new File("./src/main/resources/laba/travelagency/testdata/flightsData.csv"), 
+				values -> new Flight(values[0], values[1], values[2], values[3], values[4], Integer.parseInt(values[5]), 
+							Double.parseDouble(values[6])), 
+				flight -> flight.getOriginAirport().equalsIgnoreCase(originAirport)
+							&& flight.getDestinationAirport().equalsIgnoreCase(destinationAirport)
+							&& flight.getDepartureTimestamp().substring(0, 10).equals(departureDate)
+						);
+	}
+	
+	public static List<Flight> getFilteredFlightResults(List<Flight> searchFlightResults, double maxPrice, int maxNoOfStops) {
+		return Utils.filter(searchFlightResults, flight -> flight.getPrice() <= maxPrice && flight.getNoOfStops() <= maxNoOfStops);
 	}
 	
 	public static int requestMaxNoOfStops() {
@@ -76,19 +83,6 @@ public class FlightReservationMenu {
 		return maxNoOfStops;
 	}
 	
-	public static List<Flight> getFilteredFlightResults(List<Flight> searchFlightResults, double maxPrice, int maxNoOfStops) {
-		List<Flight> filterFlightResults = Flight.filter(searchFlightResults, maxPrice, maxNoOfStops);
-		logger.info("\nFiltered Results -----");
-		for(Flight flight: filterFlightResults)
-		{
-			logger.info(
-					(filterFlightResults.indexOf(flight) + 1) + " | " +
-					flight.toString()
-					);
-		}
-		logger.trace("Flight search results filtered");
-		return filterFlightResults;
-	}
 	
 	public static Flight requestSelectFlight(List<Flight> filterFlightResults) {
 		logger.info("Select your flight : ");
@@ -160,4 +154,32 @@ public class FlightReservationMenu {
 		logger.debug("needMealService: {}", needMealService);
 		return needMealService;
 	}
+	
+//	public static List<Flight> getSearchFlightResults(String originAirport, String destinationAirport, String departureDate) {
+//		List<Flight> searchFlightResults = Flight.search(originAirport, destinationAirport, departureDate);
+//		logger.info("\nSearch Results -----");
+//		for(Flight flight: searchFlightResults)
+//		{
+//			logger.info(
+//					(searchFlightResults.indexOf(flight) + 1) + " | " +
+//					flight.toString()
+//					);
+//		}
+//		logger.trace("Flight search results fetched");
+//		return searchFlightResults;
+//	}
+	
+//	public static List<Flight> getFilteredFlightResults(List<Flight> searchFlightResults, double maxPrice, int maxNoOfStops) {
+//		List<Flight> filterFlightResults = Flight.filter(searchFlightResults, maxPrice, maxNoOfStops);
+//		logger.info("\nFiltered Results -----");
+//		for(Flight flight: filterFlightResults)
+//		{
+//			logger.info(
+//					(filterFlightResults.indexOf(flight) + 1) + " | " +
+//					flight.toString()
+//					);
+//		}
+//		logger.trace("Flight search results filtered");
+//		return filterFlightResults;
+//	}
 }

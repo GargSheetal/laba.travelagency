@@ -3,13 +3,18 @@ package laba.travelagency.client;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import laba.travelagency.enums.ReservationType;
 import laba.travelagency.exceptions.InputDoesNotMatchException;
 import laba.travelagency.exceptions.InvalidInputException;
 import laba.travelagency.server.Hotel;
@@ -23,9 +28,32 @@ public class MenuHelper {
 	private static final Logger logger = LogManager.getLogger(FlightReservationMenu.class);
 	
 	
+	public static <T> void printList(List<T> list, Consumer<T> consumer) {
+		list.forEach(consumer);
+	}
+	
+	public static ReservationType requestReservationType() {
+		ArrayList<String> reservationTypeList = new ArrayList<String>();
+	    for (ReservationType reservationType : ReservationType.values()) {
+	    	reservationTypeList.add(reservationType.getDisplayName());
+	    	
+	    }
+	    ReservationType input = null;
+	    try {
+			logger.info("\nEnter Reservation Type - " + reservationTypeList + " : ");		
+			String reservationTypeInput = scanner.nextLine();
+			input = ReservationType.fromDisplayName(reservationTypeInput);
+	    }
+	    catch(IllegalArgumentException e) {
+	    	System.out.println("IllegalArgumentException : " + e.getMessage());
+	    	input = requestReservationType();
+	    }
+	    return input;
+	}
+	
 	public static String requestLocation() {
 		
-		HashSet<String> locations = Hotel.getLocations();
+		Set<String> locations = Hotel.getLocations();
 		logger.info("\nEnter location " + locations.toString() + " :");
 		String location = scanner.nextLine();
 		try {
@@ -113,7 +141,7 @@ public class MenuHelper {
 	}
 
 	public static String requestPhoneNumber() {
-		logger.info("Customer Phone : ");
+		System.out.println(("Customer Phone : "));
 		String customerPhone = scanner.nextLine();
 		try {
 			if(!(customerPhone.matches("^[0-9]{10}$")))

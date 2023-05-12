@@ -1,19 +1,10 @@
 package laba.travelagency.server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.Set;
 
 import laba.travelagency.exceptions.InvalidStateException;
 
@@ -29,13 +20,12 @@ public final class Flight {
 	private final String departureTimestamp;
 	private final String arrivalTimestamp;
 	private final String flightNumber;
-	private final double price;
 	private final int noOfStops;
+	private final double price;
 	
 	public Map<Seat, String> seatOccupancyMap = new HashMap<>();
 	public LinkedList<String> queueForUpgradeToBusinessClass = new LinkedList<>();
 	
-	private static final Logger logger = LogManager.getLogger(Flight.class);
 	
 	public Flight( String flightNumber, String originAirport, String destinationAirport, String departureTimestamp, 
 			String arrivalTimestamp, int noOfStops, double price) {
@@ -77,28 +67,9 @@ public final class Flight {
 	public int getNoOfStops() {
 		return noOfStops;
 	}
-	
-	public static HashSet<String> getAirportCodes() {
-		return Utils.createHashSetFromFileContents("./src/main/resources/laba/travelagency/testdata/airportCodes.txt");
-	}
 
-	public static List<Flight> search(String originAirport, String destinationAirport, String departureDate) {
-		
-		List<Flight> matchingFlights = new ArrayList<>();
-		
-		for(Flight flight: readFlightsFromCsv(new File("./src/main/resources/laba/travelagency/testdata/flightsData.csv")))
-		{
-			if(
-					flight.getOriginAirport().equalsIgnoreCase(originAirport) 
-					&& flight.getDestinationAirport().equalsIgnoreCase(destinationAirport)
-					&& flight.getDepartureTimestamp().substring(0, 10).equals(departureDate)
-				)
-			{
-				matchingFlights.add(flight);
-			}	
-		}
-		
-		return matchingFlights;
+	public static Set<String> getAirportCodes() {
+		return Utils.createHashSetFromFileContents("./src/main/resources/laba/travelagency/testdata/airportCodes.txt");
 	}
 	
 	@Override
@@ -132,7 +103,7 @@ public final class Flight {
 	// method to return the stringify version of the flight object
 	@Override
 	public final String toString() {
-		String s = (
+		return (
 				getFlightNumber() + " from " +
 				getOriginAirport() + " (" +
 				getDepartureTimestamp() + ") to " +
@@ -141,27 +112,6 @@ public final class Flight {
 				getNoOfStops() + " stops, $ " +
 				getPrice()
 		);	
-		return s;
-	}
-	
-	public static List<Flight> filter(List<Flight> flights, double maxPrice, int maxNoOfStops) {
-		
-		
-		List<Flight> matchingFlights = new ArrayList<>();
-		
-		for(Flight flight: flights)
-		{
-			if(
-					flight.getPrice() <= maxPrice
-					&& flight.getNoOfStops() <= maxNoOfStops
-				)
-			{
-				matchingFlights.add(flight);
-			}	
-		}
-		
-		return matchingFlights;
-		
 	}
 	
 	public void addSeatOccupancy(Seat seat, String customerEmail) throws InvalidStateException {
@@ -186,36 +136,6 @@ public final class Flight {
 		}
 	}
 	
-	public static List<Flight> readFlightsFromCsv(File file) {
-	    List<Flight> flights = new ArrayList<>();
-
-	    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-	        String line;
-
-	        while ((line = reader.readLine()) != null) {
-	            String[] values = line.split(",");
-
-	            String flightNumber = values[0];
-	            String origin = values[1];
-	            String destination = values[2];
-	            String departureTime = values[3];
-	            String arrivalTime =values[4];
-	            int noOfStops = Integer.parseInt(values[5]);
-	            double price = Double.parseDouble(values[6]);
-
-	            Flight flight = new Flight(flightNumber, origin, destination, departureTime, arrivalTime, noOfStops, price);
-	            flights.add(flight);
-	        }
-
-	    } catch (IOException e) {
-	    	System.out.println("Error while fetching Flight List: " + e.getMessage());
-	        logger.fatal("Error while fetching Flight List: {}", e.getMessage());
-	        System.exit(1);
-	    }
-
-	    return flights;
-	}
-	
 	public void addToQueueForUpgradeToBusinessClass(String customerEmail) {
 		System.out.println("\n   | Customer(" + customerEmail + ") added to queue for upgrade to Business Class for flight " + this.flightNumber);
 		queueForUpgradeToBusinessClass.add(customerEmail);
@@ -229,4 +149,73 @@ public final class Flight {
 	public String getNextInQueueForUpgradeToBusinessClass() {
 		return queueForUpgradeToBusinessClass.element();
 	}
+
+//	public static List<Flight> search(String originAirport, String destinationAirport, String departureDate) {
+//		
+//		List<Flight> matchingFlights = new ArrayList<>();
+//		
+//		for(Flight flight: readFlightsFromCsv(new File("./src/main/resources/laba/travelagency/testdata/flightsData.csv")))
+//		{
+//			if(
+//					flight.getOriginAirport().equalsIgnoreCase(originAirport) 
+//					&& flight.getDestinationAirport().equalsIgnoreCase(destinationAirport)
+//					&& flight.getDepartureTimestamp().substring(0, 10).equals(departureDate)
+//				)
+//			{
+//				matchingFlights.add(flight);
+//			}	
+//		}
+//		
+//		return matchingFlights;
+//	}
+	
+	
+	
+//	public static List<Flight> filter(List<Flight> flights, double maxPrice, int maxNoOfStops) {
+//		
+//		List<Flight> matchingFlights = new ArrayList<>();
+//		
+//		for(Flight flight: flights)
+//		{
+//			if(
+//					flight.getPrice() <= maxPrice
+//					&& flight.getNoOfStops() <= maxNoOfStops
+//				)
+//			{
+//				matchingFlights.add(flight);
+//			}	
+//		}
+//		return matchingFlights;
+//	}
+	
+//	public static List<Flight> readFlightsFromCsv(File file) {
+//	    List<Flight> flights = new ArrayList<>();
+//
+//	    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+//	        String line;
+//
+//	        while ((line = reader.readLine()) != null) {
+//	            String[] values = line.split(",");
+//
+//	            String flightNumber = values[0];
+//	            String origin = values[1];
+//	            String destination = values[2];
+//	            String departureTime = values[3];
+//	            String arrivalTime =values[4];
+//	            int noOfStops = Integer.parseInt(values[5]);
+//	            double price = Double.parseDouble(values[6]);
+//
+//	            Flight flight = new Flight(flightNumber, origin, destination, departureTime, arrivalTime, noOfStops, price);
+//	            flights.add(flight);
+//	        }
+//
+//	    } catch (IOException e) {
+//	    	System.out.println("Error while fetching Flight List: " + e.getMessage());
+//	        logger.fatal("Error while fetching Flight List: {}", e.getMessage());
+//	        System.exit(1);
+//	    }
+//
+//	    return flights;
+//	}
+
 }
