@@ -35,7 +35,7 @@ public enum CarType {
 		return numPassengers;
 	}
 	
-	public static CarType displayCarType(String displayName) {
+	public static CarType getCarTypeByDisplayName(String displayName) {
 
 			for(CarType cartype: CarType.values())
 			{

@@ -42,7 +42,7 @@ public class MenuHelper {
 	    try {
 			logger.info("\nEnter Reservation Type - " + reservationTypeList + " : ");		
 			String reservationTypeInput = scanner.nextLine();
-			input = ReservationType.fromDisplayName(reservationTypeInput);
+			input = ReservationType.getReservationTypeByDisplayName(reservationTypeInput);
 	    }
 	    catch(IllegalArgumentException e) {
 	    	System.out.println("IllegalArgumentException : " + e.getMessage());

@@ -29,7 +29,7 @@ public enum ReservationType {
 		return bookingFee;
 	}
 	
-	public static ReservationType fromDisplayName(String displayName) {
+	public static ReservationType getReservationTypeByDisplayName(String displayName) {
 		for(ReservationType reservationType: ReservationType.values())
 		{
 			if(reservationType.getDisplayName().equals(displayName))

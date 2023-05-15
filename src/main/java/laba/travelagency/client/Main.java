@@ -224,7 +224,8 @@ public class Main {
 //		
 //		logger.info("\nEnter Reservation Type - " + reservationTypeList + " : ");		
 //		String reservationTypeInput = scanner.nextLine();
-		logger.info("\nPresenting Main Menu");
+		
+		logger.info("\nPresenting Main Menu -----");
 		
 		switch(MenuHelper.requestReservationType()) {
 			case FLIGHT:

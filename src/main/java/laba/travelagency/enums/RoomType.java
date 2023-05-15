@@ -15,31 +15,31 @@ public enum RoomType {
 	KING("King", 4),
 	SUITE("Suite", 4);
 	
-	private final String roomName;
+	private final String displayName;
 	private final int capacity;
 	
-	private RoomType(String roomName, int capacity) {
-		this.roomName = roomName;
+	private RoomType(String displayName, int capacity) {
+		this.displayName = displayName;
 		this.capacity = capacity;
 	}
 
 	public String getRoomName() {
-		return roomName;
+		return displayName;
 	}
 
 	public int getCapacity() {
 		return capacity;
 	}
 	
-	public static RoomType displayRoomName(String roomName) {
+	public static RoomType getRoomTypeByDisplayName(String displayName) {
 		for(RoomType roomType: RoomType.values()) 
 		{
-			if(roomType.roomName.equals(roomName))
+			if(roomType.displayName.equals(displayName))
 			{
 				return roomType;
 			}
 		}
-		throw new IllegalArgumentException("Invalid Room Type : " + roomName);
+		throw new IllegalArgumentException("Invalid Room Type : " + displayName);
 	}
 	
 }
