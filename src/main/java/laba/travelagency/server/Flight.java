@@ -1,13 +1,22 @@
 package laba.travelagency.server;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import laba.travelagency.exceptions.InvalidStateException;
 
@@ -48,8 +57,32 @@ public final class Flight {
 		this.flightNumber = flightNumber;
 		this.noOfStops = noOfStops;
 		this.price = price;
-		this.seatOccupancyMap.put(new Seat("A1"), "mg@gmail.com");
-		queueForUpgradeToBusinessClass.add("mg@gmail.com");
+		this.initSeatOccupancyMap();
+		this.initQueueForUpgradeToBusinessClass();
+	}
+	
+	private void initSeatOccupancyMap() {
+		try {
+			this.seatOccupancyMap = FileUtils.readLines(new File("./src/main/resources/laba/travelagency/testdata/seatAvailabilityData.csv"), "UTF-8")
+					.stream()
+					.map(line -> line.split(","))
+					.filter(tokens -> tokens.length == 2)
+					.collect(Collectors.toMap(
+                            tokens -> new Seat(tokens[0].trim()),
+                            tokens -> tokens[1].trim()
+                    ));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void initQueueForUpgradeToBusinessClass() {
+		try {
+			this.queueForUpgradeToBusinessClass = FileUtils.readLines(new File("./src/main/resources/laba/travelagency/testdata/queueForBusinessClassUpgradeData.csv"), "UTF-8")
+					.stream().collect(Collectors.toCollection(LinkedList::new));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public String getOriginAirport() {
@@ -147,6 +180,7 @@ public final class Flight {
 //		}
 //	}
 	
+// above method has been restructured into the following code to demonstrate Stream API on Collections
 	public void removeSeatOccupancy(String customerEmail) {
 		seatOccupancyMap.entrySet().stream()
 		.filter(entry -> entry.getValue().equals(customerEmail))

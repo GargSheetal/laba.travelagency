@@ -10,7 +10,6 @@ import laba.travelagency.exceptions.MissingInputException;
 import laba.travelagency.server.ICarReservation;
 import laba.travelagency.server.IFlightReservation;
 import laba.travelagency.server.IHotelReservation;
-import laba.travelagency.server.Seat;
 import laba.travelagency.server.Trip;
 
 

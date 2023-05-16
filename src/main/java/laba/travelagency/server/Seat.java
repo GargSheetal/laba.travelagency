@@ -28,7 +28,7 @@ public class Seat {
 	
 	public static LinkedList<String> getAvailableSeats() {
 		LinkedList<String> myLinkedList = getSeatAvailability().stream()
-				.filter(seat -> seat[1].equals("available"))
+				.filter(seat -> seat.length == 1)
 				.map(seat -> seat[0]).collect(Collectors.toCollection(LinkedList::new));
 		return myLinkedList;
 	}
