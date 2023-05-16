@@ -1,10 +1,14 @@
 package laba.travelagency.server;
 
+import java.io.File;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Seat {
 	
 	private final String seatNumber;
+	private static LinkedList<String[]> seats;
 
 	public Seat(String seatNumber) {
 		this.seatNumber = seatNumber;
@@ -13,7 +17,22 @@ public class Seat {
 	public String getSeatNumber() {
 		return seatNumber;
 	}
-
+	
+	public static LinkedList<String[]> getSeatAvailability() {
+		return Utils.readDataFromCsv(new File("./src/main/resources/laba/travelagency/testdata/seatAvailabilityData.csv"));
+	}
+	
+	public static void bookSeat(String seatNumber) {
+		getSeatAvailability().stream().filter(seat -> seatNumber.equals(seat[0])).findFirst().ifPresent(seat -> seat[1] = "reserved");
+	}
+	
+	public static LinkedList<String> getAvailableSeats() {
+		LinkedList<String> myLinkedList = getSeatAvailability().stream()
+				.filter(seat -> seat[1].equals("available"))
+				.map(seat -> seat[0]).collect(Collectors.toCollection(LinkedList::new));
+		return myLinkedList;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(seatNumber);

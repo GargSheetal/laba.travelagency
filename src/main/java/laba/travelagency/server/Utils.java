@@ -3,8 +3,14 @@ package laba.travelagency.server;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -61,4 +67,17 @@ public class Utils {
 				
 	}	
 	
+	public static LinkedList<String[]> readDataFromCsv(File file) {
+		LinkedList<String[]> myLinkedList = new LinkedList<>();
+		try {
+			myLinkedList = FileUtils.readLines(file, "UTF-8").stream()
+			.map(line -> line.split(","))
+			.collect(Collectors.toCollection(LinkedList::new));
+		} catch(IOException e) {
+			System.out.println("Error while fetching Seat List: " + e.getMessage());
+			logger.fatal("Error while fetching Seat List: {}", e.getMessage());
+	        System.exit(1);
+		}
+		return myLinkedList;
+	}
 }

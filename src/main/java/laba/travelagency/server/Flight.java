@@ -1,10 +1,13 @@
 package laba.travelagency.server;
 
+import java.io.File;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import laba.travelagency.exceptions.InvalidStateException;
 
@@ -26,6 +29,15 @@ public final class Flight {
 	public Map<Seat, String> seatOccupancyMap = new HashMap<>();
 	public LinkedList<String> queueForUpgradeToBusinessClass = new LinkedList<>();
 	
+	public Flight() {
+		this.originAirport = "";
+		this.destinationAirport = "";
+		this.departureTimestamp  = LocalDate.now().toString();
+		this.arrivalTimestamp = LocalDate.now().toString();
+		this.flightNumber = "";
+		this.noOfStops = 0;
+		this.price = 0;
+	}
 	
 	public Flight( String flightNumber, String originAirport, String destinationAirport, String departureTimestamp, 
 			String arrivalTimestamp, int noOfStops, double price) {
@@ -39,7 +51,7 @@ public final class Flight {
 		this.seatOccupancyMap.put(new Seat("A1"), "mg@gmail.com");
 		queueForUpgradeToBusinessClass.add("mg@gmail.com");
 	}
-
+	
 	public String getOriginAirport() {
 		return originAirport;
 	}
@@ -115,7 +127,6 @@ public final class Flight {
 	}
 	
 	public void addSeatOccupancy(Seat seat, String customerEmail) throws InvalidStateException {
-        
 		if (seatOccupancyMap.containsKey(seat)) {
             throw new InvalidStateException(seat.toString() + " is occupied!");
         } else {
@@ -123,17 +134,27 @@ public final class Flight {
         }
     }
 	
+//	public void removeSeatOccupancy(String customerEmail) {
+//		
+//		for(Map.Entry<Seat, String> entry: seatOccupancyMap.entrySet())
+//		{
+//			if(entry.getValue() == customerEmail)
+//			{
+//				Seat seat = entry.getKey();
+//				seatOccupancyMap.remove(seat);
+//				System.out.println("\n   | Customer(" + customerEmail + ") is unassigned from " + seat.toString() + " of flight " + this.flightNumber);
+//			}
+//		}
+//	}
+	
 	public void removeSeatOccupancy(String customerEmail) {
-		
-		for(Map.Entry<Seat, String> entry: seatOccupancyMap.entrySet())
-		{
-			if(entry.getValue() == customerEmail)
-			{
-				Seat seat = entry.getKey();
-				seatOccupancyMap.remove(seat);
-				System.out.println("\n   | Customer(" + customerEmail + ") is unassigned from " + seat.toString() + " of flight " + this.flightNumber);
-			}
-		}
+		seatOccupancyMap.entrySet().stream()
+		.filter(entry -> entry.getValue().equals(customerEmail))
+		.forEach(entry -> {
+			Seat seat = entry.getKey();
+			seatOccupancyMap.remove(seat);
+			System.out.println("\n   | Customer(" + customerEmail + ") is unassigned from " + seat.toString() + " of flight " + this.flightNumber);
+		});
 	}
 	
 	public void addToQueueForUpgradeToBusinessClass(String customerEmail) {
@@ -150,43 +171,6 @@ public final class Flight {
 		return queueForUpgradeToBusinessClass.element();
 	}
 
-//	public static List<Flight> search(String originAirport, String destinationAirport, String departureDate) {
-//		
-//		List<Flight> matchingFlights = new ArrayList<>();
-//		
-//		for(Flight flight: readFlightsFromCsv(new File("./src/main/resources/laba/travelagency/testdata/flightsData.csv")))
-//		{
-//			if(
-//					flight.getOriginAirport().equalsIgnoreCase(originAirport) 
-//					&& flight.getDestinationAirport().equalsIgnoreCase(destinationAirport)
-//					&& flight.getDepartureTimestamp().substring(0, 10).equals(departureDate)
-//				)
-//			{
-//				matchingFlights.add(flight);
-//			}	
-//		}
-//		
-//		return matchingFlights;
-//	}
-	
-	
-	
-//	public static List<Flight> filter(List<Flight> flights, double maxPrice, int maxNoOfStops) {
-//		
-//		List<Flight> matchingFlights = new ArrayList<>();
-//		
-//		for(Flight flight: flights)
-//		{
-//			if(
-//					flight.getPrice() <= maxPrice
-//					&& flight.getNoOfStops() <= maxNoOfStops
-//				)
-//			{
-//				matchingFlights.add(flight);
-//			}	
-//		}
-//		return matchingFlights;
-//	}
 	
 //	public static List<Flight> readFlightsFromCsv(File file) {
 //	    List<Flight> flights = new ArrayList<>();

@@ -9,14 +9,68 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import laba.travelagency.enums.RoomType;
+import laba.travelagency.exceptions.MissingInputException;
 import laba.travelagency.server.Flight;
 import laba.travelagency.server.Hotel;
+import laba.travelagency.server.IHotelReservation;
+import laba.travelagency.server.ReservationFactory;
 import laba.travelagency.server.Utils;
 
-public class HotelReservationMenu {
+public class HotelReservationMenu{
 
 	private static Scanner scanner = new Scanner(System.in);
 	private static final Logger logger = LogManager.getLogger(FlightReservationMenu.class);
+	
+	
+	public static IHotelReservation launch() {
+		
+		logger.info("\nHotel Reservation started -----");
+		String location = MenuHelper.requestLocation();
+		
+		String dateOfStay = MenuHelper.requestDate("Enter date of stay (yyyy-MM-dd) : ");
+		logger.debug("dateOfStay: {}", dateOfStay);
+		
+		List<Hotel> searchHotelResults = getHotelSearchResults(location, dateOfStay);
+		logger.info("\nSearch Results -----");
+		MenuHelper.printList(searchHotelResults, hotel -> System.out.println((searchHotelResults.indexOf(hotel) + 1) + " | " + hotel.toString()));
+		
+		logger.info("\nSet Filters : ");
+		double maxPrice = MenuHelper.requestMaxPrice();
+		
+		RoomType roomType = requestRoomType();
+		
+		List<Hotel> filteredHotelResults = getFilteredHotelResults(searchHotelResults, maxPrice, roomType);
+		logger.info("\nFiltered results -----");
+		MenuHelper.printList(filteredHotelResults, hotel -> System.out.println((filteredHotelResults.indexOf(hotel) + 1) + " | " + hotel.toString()));
+		
+		Hotel selectedHotel = requestSelectHotel(filteredHotelResults);
+		
+		IHotelReservation hotelReservation = ReservationFactory.createHotelReservation(selectedHotel);
+		logger.debug("Hotel reservation initiated : {}", hotelReservation.getReservationId());
+		
+		String customerName = MenuHelper.requestCustomerName();
+		hotelReservation.getCustomer().setCustomerName(customerName);
+		
+		String customerEmail = MenuHelper.requestCustomerEmail();
+		hotelReservation.getCustomer().setCustomerEmail(customerEmail);
+		
+		String customerPhone = MenuHelper.requestPhoneNumber();
+		hotelReservation.getCustomer().setCustomerPhone(customerPhone);
+		
+		boolean needFreeBreakfast = requestNeedFreeBreakfast();
+		hotelReservation.setNeedFreeBreakfast(needFreeBreakfast);
+		
+		boolean needFreeInternet = requestNeedFreeInternet();
+		hotelReservation.setNeedFreeInternet(needFreeInternet);
+	
+		try {
+			hotelReservation.confirmReservation();
+		} catch (MissingInputException e) {
+			hotelReservation = null;
+			logger.error("Hotel cannot be reserved. MissingInputException : {}", e.getMessage());
+		}
+		return hotelReservation;
+	}
 	
 	
 	public static RoomType requestRoomType() {
@@ -46,35 +100,6 @@ public class HotelReservationMenu {
 		return Utils.filter(searchHotelResults, hotel -> hotel.getPrice() <= maxPrice && hotel.getRoomType().equals(roomType));
 	}
 	
-//	public static List<Hotel> getHotelSearchResults(String location, String dateOfStay) {
-//		List<Hotel> searchHotelResults = Hotel.search(location, dateOfStay);
-//		logger.info("\nSearch Results -----");
-//	
-//		for(Hotel hotel: searchHotelResults)
-//		{
-//			logger.info(
-//				(searchHotelResults.indexOf(hotel) + 1) + " | " +
-//				hotel.toString()
-//				);
-//		}
-//		logger.trace("Hotel search results fetched");
-//		return searchHotelResults;
-//  }
-	
-//	public static List<Hotel> getFilteredHotelResults(List<Hotel> searchHotelResults, double maxPrice, String roomType) {
-//		List<Hotel> filteredHotelResults = Hotel.filter(searchHotelResults, maxPrice, roomType);
-//		logger.info("\nFiltered results: ");
-//		
-//		for(Hotel hotel: filteredHotelResults) 
-//		{
-//			logger.info(
-//					(filteredHotelResults.indexOf(hotel) + 1) + " | " +
-//						hotel.toString()
-//					);
-//		}
-//		logger.trace("Hotel search results filtered");
-//		return filteredHotelResults;
-//	}
 	
 	public static Hotel requestSelectHotel(List<Hotel> filteredHotelResults) {
 		logger.info("Select your hotel : ");
