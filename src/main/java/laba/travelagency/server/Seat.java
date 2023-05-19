@@ -22,10 +22,6 @@ public class Seat {
 		return Utils.readDataFromCsv(new File("./src/main/resources/laba/travelagency/testdata/seatAvailabilityData.csv"));
 	}
 	
-	public static void bookSeat(String seatNumber) {
-		getSeatAvailability().stream().filter(seat -> seatNumber.equals(seat[0])).findFirst().ifPresent(seat -> seat[1] = "reserved");
-	}
-	
 	public static LinkedList<String> getAvailableSeats() {
 		LinkedList<String> myLinkedList = getSeatAvailability().stream()
 				.filter(seat -> seat.length == 1)

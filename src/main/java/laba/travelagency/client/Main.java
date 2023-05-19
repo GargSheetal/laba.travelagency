@@ -5,6 +5,7 @@ import java.util.Scanner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import laba.travelagency.connections.ConnectionsDemo;
 import laba.travelagency.enums.ReservationType;
 import laba.travelagency.exceptions.MissingInputException;
 import laba.travelagency.server.ICarReservation;
@@ -29,7 +30,7 @@ public class Main {
 	}
 	
 	private static void mainMenu() throws MissingInputException {
-		logger.info("\nPresenting Main Menu -----");
+		logger.info("\n *** Presenting Main Menu *** ");
 		switch(MenuHelper.requestReservationType()) {
 			case FLIGHT:
 				IFlightReservation flightReservation = FlightReservationMenu.launch();
@@ -47,11 +48,13 @@ public class Main {
 		}
 	}
 	
-	public static void main(String[] args) throws MissingInputException {	
-//		Flight flight = new Flight();
-//		ReflectionClassExample.getClassDetails(flight);
-		mainMenu();
-		logger.info(trip.toString());
-		scanner.close();
+	public static void main(String[] args) throws MissingInputException, ClassNotFoundException {	
+//		ReflectionClassExample.getClassDetails("laba.travelagency.server.Flight");
+//		mainMenu();
+//		logger.info(trip.toString());
+//		scanner.close();
+
+		ConnectionsDemo.launch();
+	
 	}
 }

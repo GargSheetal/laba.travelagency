@@ -3,14 +3,12 @@ package laba.travelagency.client;
 import java.io.File;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import laba.travelagency.enums.RoomType;
 import laba.travelagency.exceptions.MissingInputException;
-import laba.travelagency.server.Flight;
 import laba.travelagency.server.Hotel;
 import laba.travelagency.server.IHotelReservation;
 import laba.travelagency.server.ReservationFactory;
